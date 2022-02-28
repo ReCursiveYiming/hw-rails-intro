@@ -10,18 +10,39 @@ class MoviesController < ApplicationController
       # @movies = Movie.all
       # @all_ratings = ['G', 'PG', 'PG-13', 'R']
       # @all_ratings = Movie.ratings
-      @checks = params[:ratings] == nil ? @all_ratings : params[:ratings].keys
       
-      if params[:sort]
-        @movies = Movie.order(params[:sort])
-      else
-        @movies = Movie.all
+      
+      @url = request.original_url
+      if ! (@url =~ /movies/) # url does not contain /movies/ 
+        session.clear
       end
       
-      if params[:ratings]
-        @params_ratings = params[:ratings]
+      @checks = params[:ratings] == nil ? @all_ratings : params[:ratings].keys
+      
+      if params[:sort] || session[:sort]
+        if params[:sort]
+          @movies = Movie.order(params[:sort])
+        elsif session[:sort]
+          @movies = Movie.order(session[:sort])
+        end
         
+        session[:sort] = params[:sort]
+        
+      else
+        @movies = Movie.all
+        # session[:sort] = nil
+      end
+      
+      
+      if params[:ratings] || session[:ratings]
+        if params[:ratings]
+          @params_ratings = params[:ratings]
+          
+        elsif session[:ratings]
+          @params_ratings = session[:ratings]
+        end
         @movies = Movie.with_ratings(@params_ratings.keys).order(params[:sort])
+        session[:ratings] = params[:ratings]
       end
         
       
