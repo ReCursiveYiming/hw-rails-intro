@@ -14,8 +14,7 @@
  *= require_self
  */
 
-hilite {
-  background-color: yellow;
+.hilite{
+    background-color: yellow;
 } 
-
 
